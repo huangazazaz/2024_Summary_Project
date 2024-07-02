@@ -1,0 +1,102 @@
+{
+  "1": {
+    "inputs": {
+      "ckpt_name": "sd3_medium_incl_clips.safetensors"
+    },
+    "class_type": "CheckpointLoaderSimple"
+  },
+  "2": {
+    "inputs": {
+      "model": [
+        "1",
+        0
+      ],
+      "clip": [
+        "1",
+        1
+      ],
+      "strength_model": 0.7,
+      "strength_clip": 0.7,
+      "lora_name": "V3-艺术海报构图设计LoRA-CADS-AiARTiST_测试版.safetensors"
+    },
+    "class_type": "LoraLoader"
+  },
+  "3": {
+    "inputs": {
+      "seed": 764714814161513,
+      "control_after_generate": "randomize",
+      "steps": 30,
+      "cfg": 4.0,
+      "sampler_name": "dpmpp_2m",
+      "scheduler": "sgm_uniform",
+      "denoise": 1.00,
+      "model": [
+        "2",
+        0
+      ],
+      "positive": [
+        "6",
+        0
+      ],
+      "negative": [
+        "7",
+        0
+      ],
+      "latent_image": [
+        "5",
+        0
+      ]
+    },
+    "class_type": "KSampler"
+  },
+  "5": {
+    "inputs": {
+      "width": 1024,
+      "height": 768,
+      "batch_size": 1
+    },
+    "class_type": "EmptyLatentImage"
+  },
+  "6": {
+    "inputs": {
+      "text": "sweaty basketball player with glasses",
+      "clip": [
+        "2",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode"
+  },
+  "7": {
+    "inputs": {
+      "text": "text",
+      "clip": [
+        "2",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode"
+  },
+  "8": {
+    "inputs": {
+      "samples": [
+        "3",
+        0
+      ],
+      "vae": [
+        "1",
+        2
+      ]
+    },
+    "class_type": "VAEDecode"
+  },
+  "9": {
+    "inputs": {
+      "images": [
+        "8",
+        0
+      ]
+    },
+    "class_type": "PreviewImage"
+  }
+}
