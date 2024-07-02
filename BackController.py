@@ -1,34 +1,33 @@
-from sanic import Sanic
-import sanic.response as sr
 import uuid
-import json
-import urllib.request
-import urllib.parse
+
+from sanic import Sanic
+from sanic.response import json
+import json as js
+import ComfyUIApi
 
 app = Sanic("MyApp")
-server_address = "127.0.0.1:8188"
-client_id = str(uuid.uuid4())
+
+apiService = ComfyUIApi.ApiService()
+
+clients = []
 
 
-@app.route('/')
-async def test(request):
-    return sr.json({"info": "visit /image to get picture"})
+@app.websocket("/connect")
+async def connect(request, ws):
+    client_id = str(uuid.uuid4())
+    apiService.link(client_id, ws)
+    data = await ws.recv()
+    data = js.loads(data)
+    pos_text = data['pos_des']
+    neg_text = data['neg_des']
+    style = data['style']
+    print("Received:", data)
+    await apiService.generate(pos_text, neg_text, style, client_id)
 
 
-@app.route('/image')
-async def image(request):
-
-    prompt = json.load(open('test.json', encoding='utf-8'))
-    data = json.dumps(prompt).encode('utf-8')
-    req = urllib.request.Request("http://{}/prompt".format(server_address), data=data)
-    prompt_id = json.loads(urllib.request.urlopen(req).read())['prompt_id']
-    return sr.json({"id": prompt_id})
-
-
-@app.route('/history/<prompt_id>')
-async def history(request, prompt_id):
-    with urllib.request.urlopen("http://{}/history/{}".format(server_address, prompt_id)) as response:
-        return json.loads(response.read())
+@app.route('/styles')
+async def styles(request):
+    return json({'data': apiService.styles})
 
 
 if __name__ == '__main__':

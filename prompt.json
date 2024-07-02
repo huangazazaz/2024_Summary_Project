@@ -1,18 +1,18 @@
 {
-  "1": {
+  "Checkpoint": {
     "inputs": {
       "ckpt_name": "sd3_medium_incl_clips.safetensors"
     },
     "class_type": "CheckpointLoaderSimple"
   },
-  "2": {
+  "Lora": {
     "inputs": {
       "model": [
-        "1",
+        "Checkpoint",
         0
       ],
       "clip": [
-        "1",
+        "Checkpoint",
         1
       ],
       "strength_model": 0.7,
@@ -21,7 +21,7 @@
     },
     "class_type": "LoraLoader"
   },
-  "3": {
+  "KSampler": {
     "inputs": {
       "seed": 764714814161513,
       "control_after_generate": "randomize",
@@ -31,25 +31,25 @@
       "scheduler": "sgm_uniform",
       "denoise": 1.00,
       "model": [
-        "2",
+        "Lora",
         0
       ],
       "positive": [
-        "6",
+        "PosCLIP",
         0
       ],
       "negative": [
-        "7",
+        "NegCLIP",
         0
       ],
       "latent_image": [
-        "5",
+        "Latent",
         0
       ]
     },
     "class_type": "KSampler"
   },
-  "5": {
+  "Latent": {
     "inputs": {
       "width": 1024,
       "height": 768,
@@ -57,34 +57,34 @@
     },
     "class_type": "EmptyLatentImage"
   },
-  "6": {
+  "PosCLIP": {
     "inputs": {
       "text": "sweaty basketball player with glasses",
       "clip": [
-        "2",
+        "Lora",
         1
       ]
     },
     "class_type": "CLIPTextEncode"
   },
-  "7": {
+  "NegCLIP": {
     "inputs": {
       "text": "text",
       "clip": [
-        "2",
+        "Lora",
         1
       ]
     },
     "class_type": "CLIPTextEncode"
   },
-  "8": {
+  "VAEDecode": {
     "inputs": {
       "samples": [
-        "3",
+        "KSampler",
         0
       ],
       "vae": [
-        "1",
+        "Checkpoint",
         2
       ]
     },
@@ -93,7 +93,7 @@
   "9": {
     "inputs": {
       "images": [
-        "8",
+        "VAEDecode",
         0
       ]
     },
