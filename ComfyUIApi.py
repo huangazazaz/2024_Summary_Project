@@ -81,7 +81,7 @@ class ApiService:
                     if data['node'] is None and data['prompt_id'] == prompt_id:
                         await self.links[client_id].send(json.dumps({'type': 'state', 'data': "done"}))
                         break  # 执行完成
-                await self.links[client_id].send(json.dumps({'type': 'state', 'data': message['type']}))
+                await self.links[client_id].send(json.dumps({'type': 'state', 'data': message}))
             else:
                 continue  # 预览是二进制数据
 
