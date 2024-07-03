@@ -16,13 +16,14 @@ clients = []
 async def connect(request, ws):
     client_id = str(uuid.uuid4())
     apiService.link(client_id, ws)
-    data = await ws.recv()
-    data = js.loads(data)
-    pos_text = data['pos_des']
-    neg_text = data['neg_des']
-    style = data['style']
-    print("Received:", data)
-    await apiService.generate(pos_text, neg_text, style, client_id)
+    while True:
+        data = await ws.recv()
+        data = js.loads(data)
+        pos_text = data['pos_des']
+        neg_text = data['neg_des']
+        style = data['style']
+        print("Received:", data)
+        await apiService.generate(pos_text, neg_text, style, client_id)
 
 
 @app.route('/styles')
