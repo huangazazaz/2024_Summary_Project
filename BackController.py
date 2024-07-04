@@ -19,11 +19,8 @@ async def connect(request, ws):
     while True:
         data = await ws.recv()
         data = js.loads(data)
-        pos_text = data['pos_des']
-        neg_text = data['neg_des']
-        style = data['style']
         print("Received:", data)
-        await apiService.generate(pos_text, neg_text, style, client_id)
+        await apiService.generate(data, client_id)
 
 
 @app.route('/styles')

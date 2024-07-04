@@ -1,9 +1,14 @@
 # 导入所需库
+import random
+
 import websocket  # NOTE: 需要安装websocket-client (https://github.com/websocket-client/websocket-client)
 import uuid
 import json
 import urllib.request
 import urllib.parse
+
+from PIL import Image
+import io
 
 
 class ApiService:
@@ -38,18 +43,27 @@ class ApiService:
         self.links[client_id] = ws
         self.back_links[client_id] = back_ws
 
-    async def generate(self, pos_text, neg_text, style, client_id):
+    async def generate(self, data, client_id):
         prompt = json.load(open('prompt.json', encoding='utf-8'))
-        prompt["PosCLIP"]["inputs"]["text"] = pos_text
-        prompt["NegCLIP"]["inputs"]["text"] = neg_text
+        prompt["PosCLIP"]["inputs"]["text"] = data['pos_des']
+        prompt["NegCLIP"]["inputs"]["text"] = data['neg_des']
+        prompt["Lora"]["inputs"]["strength_model"] = data['strength_model']
+        prompt["Lora"]["inputs"]["strength_clip"] = data['strength_clip']
+        prompt["KSampler"]["inputs"]["steps"] = data['steps']
+        prompt["KSampler"]["inputs"]["cfg"] = data['cfg']
+        prompt["KSampler"]["inputs"]["denoise"] = data['denoise']
+        prompt["Latent"]["inputs"]["width"] = data['width']
+        prompt["Latent"]["inputs"]["height"] = data['height']
+        prompt["Latent"]["inputs"]["batch_size"] = data['batch_size']
         for s in self.styles:
-            if s['id'] == style:
+            if s['id'] == data['style']:
                 prompt["Lora"]["inputs"]["lora_name"] = s['styleName']
                 break
         await self.get_images(prompt, client_id)
 
     def queue_prompt(self, prompt, client_id):
         print('queue')
+        prompt["KSampler"]["inputs"]["seed"] = random.randint(100000000, 1000000000000)
         p = {"prompt": prompt, "client_id": client_id}
         data = json.dumps(p).encode('utf-8')
         req = urllib.request.Request("http://{}/prompt".format(self.server_address), data=data)
@@ -89,27 +103,16 @@ class ApiService:
         for node_id in history['outputs']:
             node_output = history['outputs'][node_id]
             if 'images' in node_output:
-                images_output = []
                 for image in node_output['images']:
                     image_data = self.get_image(image['filename'], image['subfolder'], image['type'])
-                    images_output.append(image_data)
-                output_images[node_id] = images_output
-        for node_id in output_images:
-            for image_data in output_images[node_id]:
-                from PIL import Image
-                import io
-                await self.links[client_id].send(image_data)
-                image = Image.open(io.BytesIO(image_data))
-                image.show()
-        return output_images
-
+                    await self.links[client_id].send(image_data)
+                    # image = Image.open(io.BytesIO(image_data))
+                    # image.show()
     # 显示输出图像（这部分已注释掉）
     # Commented out code to display the output images:
     #
     # for node_id in images:
     #     for image_data in images[node_id]:
-    #         from PIL import Image
-    #         import io
     #
     #         image = Image.open(io.BytesIO(image_data))
     #         image.show()
