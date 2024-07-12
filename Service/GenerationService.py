@@ -11,7 +11,7 @@ from PIL import Image
 import io
 
 
-class ApiService:
+class GenerationService:
     _instance = None
 
     def __new__(cls, *args, **kwargs):
@@ -45,6 +45,13 @@ class ApiService:
 
     async def generate(self, data, client_id):
         prompt = json.load(open('prompt.json', encoding='utf-8'))
+
+        # prefix()
+
+        #
+        # 翻译
+        # key 提取
+
         prompt["PosCLIP"]["inputs"]["text"] = data['pos_des']
         prompt["NegCLIP"]["inputs"]["text"] = data['neg_des']
         prompt["Lora"]["inputs"]["strength_model"] = data['strength_model']
