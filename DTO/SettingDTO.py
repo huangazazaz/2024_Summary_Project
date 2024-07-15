@@ -8,14 +8,14 @@ class Setting(Base):
     __tablename__ = 'setting'
     user_id = Column(Integer, primary_key=True, autoincrement=True)
     style = Column(Integer, nullable=False)
-    steps = Column(Integer, nullable=False)
+    steps = Column(Integer, nullable=True)
     cfg = Column(Integer, nullable=True)
     strength_model = Column(Float, nullable=True)
     strength_clip = Column(Float, nullable=True)
-    denoise = Column(Float, nullable=False)
-    width = Column(Integer, nullable=False)
-    height = Column(Integer, nullable=False)
-    batch_size = Column(Integer, nullable=False)
+    denoise = Column(Float, nullable=True)
+    width = Column(Integer, nullable=True)
+    height = Column(Integer, nullable=True)
+    batch_size = Column(Integer, nullable=True)
 
     def to_dict(self):
         return {'user_id': self.user_id, 'style': self.style, 'steps': self.steps, 'cfg': self.cfg,
