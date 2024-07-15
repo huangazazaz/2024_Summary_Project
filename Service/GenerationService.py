@@ -1,14 +1,15 @@
 # 导入所需库
 import random
-
+from datetime import datetime
+from DTO.RecordDTO import Record
 import websocket  # NOTE: 需要安装websocket-client (https://github.com/websocket-client/websocket-client)
-import uuid
 import json
 import urllib.request
 import urllib.parse
 
 from PIL import Image
 import io
+from Util.AliOSS import AliOSS
 
 
 class GenerationService:
@@ -36,6 +37,7 @@ class GenerationService:
             self.server_address = "127.0.0.1:8188"
             self.links = {}
             self.back_links = {}
+            self.oss = AliOSS()
 
     def link(self, client_id, ws):
         back_ws = websocket.WebSocket()
@@ -45,7 +47,8 @@ class GenerationService:
 
     async def generate(self, data, client_id):
         prompt = json.load(open('prompt.json', encoding='utf-8'))
-
+        user_id = 3
+        text = "adsfafd"
         # prefix()
 
         #
@@ -66,30 +69,7 @@ class GenerationService:
             if s['id'] == data['style']:
                 prompt["Lora"]["inputs"]["lora_name"] = s['styleName']
                 break
-        await self.get_images(prompt, client_id)
 
-    def queue_prompt(self, prompt, client_id):
-        print('queue')
-        prompt["KSampler"]["inputs"]["seed"] = random.randint(100000000, 1000000000000)
-        p = {"prompt": prompt, "client_id": client_id}
-        data = json.dumps(p).encode('utf-8')
-        req = urllib.request.Request("http://{}/prompt".format(self.server_address), data=data)
-        return json.loads(urllib.request.urlopen(req).read())
-
-    # 定义从服务器下载图像数据的函数
-    def get_image(self, filename, subfolder, folder_type):
-        data = {"filename": filename, "subfolder": subfolder, "type": folder_type}
-        url_values = urllib.parse.urlencode(data)
-        with urllib.request.urlopen("http://{}/view?{}".format(self.server_address, url_values)) as response:
-            return response.read()
-
-    # 定义获取历史记录的函数
-    def get_history(self, prompt_id):
-        with urllib.request.urlopen("http://{}/history/{}".format(self.server_address, prompt_id)) as response:
-            return json.loads(response.read())
-
-    # 定义通过WebSocket接收消息并下载图像的函数
-    async def get_images(self, prompt, client_id):
         prompt_id = self.queue_prompt(prompt, client_id)['prompt_id']
         print(prompt_id)
         output_images = {}
@@ -112,9 +92,36 @@ class GenerationService:
             if 'images' in node_output:
                 for image in node_output['images']:
                     image_data = self.get_image(image['filename'], image['subfolder'], image['type'])
+                    url = self.oss.uploadFile(image, image['filename'] + datetime.now().strftime("%Y%m%d%H%M%S"))
+                    new_record = Record(user_id=user_id, text=text, url=url, style=data['style'],
+                                        generation_time=datetime.now(), strength_clip=data['strength_clip'],
+                                        strength_model=data['strength_model'], steps=data['steps'], cfg=data['cfg'],
+                                        denoise=data['denoise'], width=data['width'], height=data['height'],
+                                        batch_size=data['batch_size'])
                     await self.links[client_id].send(image_data)
                     # image = Image.open(io.BytesIO(image_data))
                     # image.show()
+
+    def queue_prompt(self, prompt, client_id):
+        print('queue')
+        prompt["KSampler"]["inputs"]["seed"] = random.randint(100000000, 1000000000000)
+        p = {"prompt": prompt, "client_id": client_id}
+        data = json.dumps(p).encode('utf-8')
+        req = urllib.request.Request("http://{}/prompt".format(self.server_address), data=data)
+        return json.loads(urllib.request.urlopen(req).read())
+
+    # 定义从服务器下载图像数据的函数
+    def get_image(self, filename, subfolder, folder_type):
+        data = {"filename": filename, "subfolder": subfolder, "type": folder_type}
+        url_values = urllib.parse.urlencode(data)
+        with urllib.request.urlopen("http://{}/view?{}".format(self.server_address, url_values)) as response:
+            return response.read()
+
+    # 定义获取历史记录的函数
+    def get_history(self, prompt_id):
+        with urllib.request.urlopen("http://{}/history/{}".format(self.server_address, prompt_id)) as response:
+            return json.loads(response.read())
+
     # 显示输出图像（这部分已注释掉）
     # Commented out code to display the output images:
     #

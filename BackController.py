@@ -15,6 +15,8 @@ userMapper = UserMapper.UserMapper()
 clients = []
 
 
+# generation ===========================================
+
 @app.websocket("/connect")
 async def connect(request, ws):
     client_id = str(uuid.uuid4())
@@ -31,21 +33,25 @@ async def styles(request):
     return json({'data': generationService.styles()})
 
 
+# =============================================
+
+# user ===========================================
 @app.route('/register', methods=["POST"])
 async def register(request):
     data = request.json
     new_user = User(username=data['username'], password=data['password'], email=data['email'],
                     avatar=data['avatar'])
 
-    return json({'data': userMapper.add(new_user)})
+    return json({'data': userMapper.register(new_user)})
 
 
 @app.route('/get')
 async def get(request):
-    username = request.args.get('username')  # 获取查询参数username
-    print(username)
+    username = request.args.get('username')
     return json({'data': userMapper.get(username).to_dict()})
 
+
+# =============================================
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8765, debug=True)
