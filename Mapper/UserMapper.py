@@ -13,9 +13,14 @@ class UserMapper:
         Base.metadata.create_all(self.engine)
         self.session = sessionmaker(bind=self.engine)()
 
-    def add(self, user: User):
-        self.session.add(user)
-        self.session.commit()
+    def register(self, user: User):
+        try:
+            self.session.add(user)
+            self.session.commit()
+            return 'success'
+        except Exception as e:
+            self.session.rollback()
+            return 'fail'
 
     def get(self, username):
         user = self.session.query(User).filter(User.username == username).first()
