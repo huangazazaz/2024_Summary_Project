@@ -31,10 +31,11 @@ async def styles(request):
     return json({'data': generationService.styles()})
 
 
-@app.route('/add')
-async def add(request):
-    new_user = User(username='johndoe', password='securepassword', email='john.doe@example.com',
-                    avatar='path/to/avatar.jpg')
+@app.route('/register', methods=["POST"])
+async def register(request):
+    data = request.json
+    new_user = User(username=data['username'], password=data['password'], email=data['email'],
+                    avatar=data['avatar'])
 
     return json({'data': userMapper.add(new_user)})
 
