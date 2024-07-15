@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import json
+
 import oss2
 import os
 from io import BytesIO
@@ -7,10 +9,11 @@ from io import BytesIO
 class AliOSS(object):
     def __init__(self):
         self.endpoint = "https://oss-cn-shenzhen.aliyuncs.com"
+        with open('../config.json') as config_file:
+            config = json.load(config_file)
 
-        ID = "LTAI5tQgzEc5gZR28uCr3aML"
-
-        Secret = "8ZXjBf0CMVtEUi4to5aPoAxVm9Cizj"
+        ID = config['ALIOSS_ACCESS_KEY_ID']
+        Secret = config['ALIOSS_ACCESS_KEY_SECRET']
 
         self.bucketName = "sustech-event-center"
 
