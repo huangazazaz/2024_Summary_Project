@@ -5,7 +5,7 @@ from datetime import datetime
 Base = declarative_base()
 
 
-class User(Base):
+class Record(Base):
     __tablename__ = 'record'
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, nullable=False)
