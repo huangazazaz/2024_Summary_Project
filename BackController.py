@@ -2,15 +2,14 @@ import uuid
 
 from sanic import Sanic
 from Service import GenerationService
-from Mapper import UserMapper
 from sanic.response import json
 import json as js
-from DTO.UserDTO import User
+from Service.UserService import UserService
 
 app = Sanic("MyApp")
 
 generationService = GenerationService.GenerationService()
-userMapper = UserMapper.UserMapper()
+userService = UserService()
 
 clients = []
 
@@ -41,19 +40,16 @@ async def history(request, user_id):
 # =============================================
 
 # user ===========================================
+
+
 @app.route('/register', methods=["POST"])
 async def register(request):
-    data = request.json
-    new_user = User(username=data['username'], password=data['password'], email=data['email'],
-                    avatar=data['avatar'])
-
-    return json({'data': userMapper.register(new_user)})
+    return await userService.register(request)
 
 
-@app.route('/get')
-async def get(request):
-    username = request.args.get('username')
-    return json({'data': userMapper.get(username).to_dict()})
+@app.route('/login', methods=["POST"])
+async def login(request):
+    return await userService.login(request)
 
 
 # =============================================

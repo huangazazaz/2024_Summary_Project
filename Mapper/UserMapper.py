@@ -14,14 +14,23 @@ class UserMapper:
 
     def register(self, user: User):
         try:
+            user = self.session.query(User).filter(User.username == user.username).first()
+            if user:
+                return 'user existed'
             self.session.add(user)
             self.session.commit()
             return 'success'
         except Exception as e:
             self.session.rollback()
-            return 'fail'
+            return 'server error'
 
-    def get(self, username):
+    def login(self, username, password):
         user = self.session.query(User).filter(User.username == username).first()
-        print(user)
-        return user
+
+        if not user:
+            return 'user not exist'
+
+        if not password == user.password:
+            return 'password error'
+
+        return 'success'
