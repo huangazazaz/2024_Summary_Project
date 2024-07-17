@@ -9,11 +9,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "vue": "^3.4.29",
-    "element-plus": "^2.6.3",
-    "webstomp-client": "^1.2.6",
+    "@vue/reactivity": "^3.4.31",
     "axios": "^1.6.7",
-    "@vue/reactivity": "^3.4.21"
+    "element-plus": "^2.6.3",
+    "vue": "^3.4.29",
+    "webstomp-client": "^1.2.6"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.5",

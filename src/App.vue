@@ -8,7 +8,7 @@ const generateData = ref({
   pos_des: '',
   neg_des: '',
   style: 0,
-  steps: 30,
+  steps: 3,
   cfg: 4,
   strength_model: 0.7,
   strength_clip: 0.7,
@@ -38,18 +38,19 @@ let client
 const imageUrl = ref('')
 const state = ref('ready')
 const connect = async () => {
-  client = new WebSocket('ws://localhost:8899/connect');
+  client = new WebSocket('ws://10.12.74.75:8765/connect');
   client.onmessage = (event) => {
-    if (typeof event.data === "string") {
+
+
       let data = JSON.parse(event.data)
-      console.log(data)
-      state.value = data.data.type
-      if (state.value === 'progress') state.value += ' ' + data.data.data.value + '/' + data.data.data.max
-    } else {
-      const blob = new Blob([event.data], {type: 'image/png'});
-      // 创建 URL 对象
-      imageUrl.value = URL.createObjectURL(blob);
-    }
+      if (data.type === 'state') {
+        state.value = data.data.type
+        if(data.data.type === 'progress')
+          state.value += ' ' + data.data.data.value + '/' + data.data.data.max
+      }else if(data.type === 'image'){
+        imageUrl.value = data.data
+        console.log(imageUrl.value)
+      }
   };
   client.onopen = () => {
     console.log('WebSocket connected');
@@ -137,7 +138,7 @@ const connect = async () => {
       <el-text style="margin-left: 50px">{{ state }}</el-text>
     </div>
     <div style="width: 1648px;margin:auto">
-      <img :src="imageUrl">
+      <img :src="imageUrl" alt="" style="width: 100%;height: 100%"/>
     </div>
   </div>
 </template>
