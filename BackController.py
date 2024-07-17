@@ -30,7 +30,12 @@ async def connect(request, ws):
 
 @app.route('/styles')
 async def styles(request):
-    return json({'data': generationService.styles()})
+    return json({'data': generationService.styles})
+
+
+@app.route('/history/<user_id>')
+async def history(request, user_id):
+    return json({'data': generationService.generation_history(user_id)})
 
 
 # =============================================

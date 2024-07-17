@@ -24,3 +24,8 @@ class RecordMapper:
     def get(self, id):
         record = self.session.query(Record).filter(Record.id == id).first()
         return record
+
+    def get_history(self, user_id):
+        records = self.session.query(Record).filter(Record.user_id == user_id).all()
+        records_dict = [record.to_dict() for record in records]
+        return records_dict

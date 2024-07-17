@@ -6,7 +6,7 @@ import websocket  # NOTE: 需要安装websocket-client (https://github.com/webso
 import json
 import urllib.request
 import urllib.parse
-
+from Mapper.RecordMapper import RecordMapper
 from PIL import Image
 import io
 from Util.AliOSS import AliOSS
@@ -38,6 +38,7 @@ class GenerationService:
             self.links = {}
             self.back_links = {}
             self.oss = AliOSS()
+            self.recordMapper = RecordMapper()
 
     def link(self, client_id, ws):
         back_ws = websocket.WebSocket()
@@ -78,8 +79,8 @@ class GenerationService:
             if isinstance(out, str):
                 message = json.loads(out)
                 if message['type'] == 'executing':
-                    data = message['data']
-                    if data['node'] is None and data['prompt_id'] == prompt_id:
+                    state_data = message['data']
+                    if state_data['node'] is None and state_data['prompt_id'] == prompt_id:
                         await self.links[client_id].send(json.dumps({'type': 'state', 'data': "done"}))
                         break  # 执行完成
                 await self.links[client_id].send(json.dumps({'type': 'state', 'data': message}))
@@ -92,12 +93,13 @@ class GenerationService:
             if 'images' in node_output:
                 for image in node_output['images']:
                     image_data = self.get_image(image['filename'], image['subfolder'], image['type'])
-                    url = self.oss.uploadFile(image, image['filename'] + datetime.now().strftime("%Y%m%d%H%M%S"))
+                    url = self.oss.uploadFile(image_data,  datetime.now().strftime("%Y%m%d%H%M%S") + image['filename'])
                     new_record = Record(user_id=user_id, text=text, url=url, style=data['style'],
                                         generation_time=datetime.now(), strength_clip=data['strength_clip'],
                                         strength_model=data['strength_model'], steps=data['steps'], cfg=data['cfg'],
                                         denoise=data['denoise'], width=data['width'], height=data['height'],
                                         batch_size=data['batch_size'])
+                    self.recordMapper.add(new_record)
                     await self.links[client_id].send(image_data)
                     # image = Image.open(io.BytesIO(image_data))
                     # image.show()
@@ -130,3 +132,5 @@ class GenerationService:
     #
     #         image = Image.open(io.BytesIO(image_data))
     #         image.show()
+    def generation_history(self, user_id):
+        return self.recordMapper.get_history(user_id)

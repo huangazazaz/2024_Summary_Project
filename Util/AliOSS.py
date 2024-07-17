@@ -9,7 +9,7 @@ from io import BytesIO
 class AliOSS(object):
     def __init__(self):
         self.endpoint = "https://oss-cn-shenzhen.aliyuncs.com"
-        with open('../config.json') as config_file:
+        with open('config.json') as config_file:
             config = json.load(config_file)
 
         ID = config['ALIOSS_ACCESS_KEY_ID']
@@ -27,5 +27,5 @@ class AliOSS(object):
         fileobj = BytesIO(data)
         fileobj.seek(0, os.SEEK_SET)
         current = fileobj.tell()
-        self.bucket.put_object(name + '.jpg', fileobj)
+        self.bucket.put_object(name, fileobj)
         return "https://" + self.bucketName + "." + self.endpoint[self.endpoint.rfind("/") + 1:] + "/" + name
