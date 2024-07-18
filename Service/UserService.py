@@ -24,6 +24,8 @@ class UserModel(BaseModel):
         if not (8 <= len(value) <= 20):
             raise ValueError('password length must be between 8 and 20 characters')
         return value
+
+
 class LoginModel(BaseModel):
     username: str
     password: str

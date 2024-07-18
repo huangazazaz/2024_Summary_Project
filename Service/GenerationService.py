@@ -100,7 +100,7 @@ class GenerationService:
                                         denoise=data['denoise'], width=data['width'], height=data['height'],
                                         batch_size=data['batch_size'])
                     self.recordMapper.add(new_record)
-                    await self.links[client_id].send(image_data)
+                    await self.links[client_id].send(json.dumps({'type': 'image', 'data': url}))
                     # image = Image.open(io.BytesIO(image_data))
                     # image.show()
 
@@ -132,5 +132,5 @@ class GenerationService:
     #
     #         image = Image.open(io.BytesIO(image_data))
     #         image.show()
-    def generation_history(self, user_id):
-        return self.recordMapper.get_history(user_id)
+    def generation_history(self, username):
+        return self.recordMapper.get_history(username)
