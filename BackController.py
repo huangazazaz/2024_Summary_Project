@@ -2,6 +2,7 @@ import uuid
 
 from sanic import Sanic
 from Service import GenerationService
+from Service import OtherService
 from sanic.response import json
 import json as js
 from Service.UserService import UserService
@@ -10,6 +11,7 @@ app = Sanic("MyApp")
 
 generationService = GenerationService.GenerationService()
 userService = UserService()
+otherService = OtherService.OtherService()
 
 clients = []
 
@@ -53,6 +55,25 @@ async def login(request):
 
 
 # =============================================
+
+
+# other ===========================================
+
+
+@app.route('/update_setting', methods=["POST"])
+async def update_setting(request):
+    data = request.json
+    setting = data.get("setting", {})
+    return await otherService.update_setting(setting)
+
+
+@app.route('/get_setting/<username>')
+async def get_setting(request, username):
+    return await otherService.get_setting(username)
+
+
+# =============================================
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8765, debug=True)
