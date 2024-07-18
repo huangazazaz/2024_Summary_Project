@@ -9,6 +9,7 @@ class Record(Base):
     __tablename__ = 'record'
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, nullable=False)
+    conversation_id = Column(Integer, nullable=False)
     text = Column(String, nullable=False)
     url = Column(String, nullable=False)
     style = Column(Integer, nullable=False)
@@ -26,6 +27,7 @@ class Record(Base):
         return {
             'id': self.id,
             'user_id': self.user_id,
+            'conversation_id': self.conversation_id,
             'text': self.text,
             'url': self.url,
             'style': self.style,
@@ -41,9 +43,10 @@ class Record(Base):
         }
 
     def __str__(self):
-        return (f"User(id={self.id}, user_id={self.user_id}, text='{self.text}', "
-                f"url='{self.url}', style={self.style}, steps={self.steps}, "
-                f"cfg={self.cfg}, strength_model={self.strength_model}, "
-                f"strength_clip={self.strength_clip}, denoise={self.denoise}, "
-                f"width={self.width}, height={self.height}, batch_size={self.batch_size}, "
-                f"generation_time='{self.generation_time}')")
+        return (
+            f"User(id={self.id}, user_id={self.user_id},conversation_id={self.conversation_id}, text='{self.text}', "
+            f"url='{self.url}', style={self.style}, steps={self.steps}, "
+            f"cfg={self.cfg}, strength_model={self.strength_model}, "
+            f"strength_clip={self.strength_clip}, denoise={self.denoise}, "
+            f"width={self.width}, height={self.height}, batch_size={self.batch_size}, "
+            f"generation_time='{self.generation_time}')")
