@@ -49,15 +49,16 @@ class GenerationService:
     async def generate(self, data, client_id):
         prompt = json.load(open('prompt.json', encoding='utf-8'))
         user_id = 3
-        text = "adsfafd"
+        # text = "adsfafd"
+        text = data['text']
         # prefix()
 
         #
         # 翻译
         # key 提取
 
-        prompt["PosCLIP"]["inputs"]["text"] = data['pos_des']
-        prompt["NegCLIP"]["inputs"]["text"] = data['neg_des']
+        prompt["PosCLIP"]["inputs"]["text"] = text
+        prompt["NegCLIP"]["inputs"]["text"] = "text"
         prompt["Lora"]["inputs"]["strength_model"] = data['strength_model']
         prompt["Lora"]["inputs"]["strength_clip"] = data['strength_clip']
         prompt["KSampler"]["inputs"]["steps"] = data['steps']
@@ -93,12 +94,12 @@ class GenerationService:
             if 'images' in node_output:
                 for image in node_output['images']:
                     image_data = self.get_image(image['filename'], image['subfolder'], image['type'])
-                    url = self.oss.uploadFile(image_data,  datetime.now().strftime("%Y%m%d%H%M%S") + image['filename'])
+                    url = self.oss.uploadFile(image_data, datetime.now().strftime("%Y%m%d%H%M%S") + image['filename'])
                     new_record = Record(user_id=user_id, text=text, url=url, style=data['style'],
                                         generation_time=datetime.now(), strength_clip=data['strength_clip'],
                                         strength_model=data['strength_model'], steps=data['steps'], cfg=data['cfg'],
                                         denoise=data['denoise'], width=data['width'], height=data['height'],
-                                        batch_size=data['batch_size'])
+                                        batch_size=data['batch_size'], conversation_id=data['conversation_id'])
                     self.recordMapper.add(new_record)
                     await self.links[client_id].send(json.dumps({'type': 'image', 'data': url}))
                     # image = Image.open(io.BytesIO(image_data))
