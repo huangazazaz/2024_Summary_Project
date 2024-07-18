@@ -32,9 +32,9 @@ async def styles(request):
     return json({'data': generationService.styles})
 
 
-@app.route('/history/<user_id>')
-async def history(request, user_id):
-    return json({'data': generationService.generation_history(user_id)})
+@app.route('/history/<username>')
+async def history(request, username):
+    return json({'data': generationService.generation_history(username)})
 
 
 # =============================================
