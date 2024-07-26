@@ -1,0 +1,10 @@
+[
+    {
+        "styleLabel": "person",
+        "styleName": "V3-1GIRL-人像LoRA-MIST-AiARTiST_1GIRL.safetensors"
+    },
+    {
+        "styleLabel": "post",
+        "styleName": "V3-艺术海报构图设计LoRA-CADS-AiARTiST_测试版.safetensors"
+    }
+]

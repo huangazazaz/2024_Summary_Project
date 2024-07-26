@@ -20,13 +20,13 @@ clients = []
 
 @app.websocket("/connect")
 async def connect(request, ws):
-    client_id = str(uuid.uuid4())
-    generationService.link(client_id, ws)
+    user_id = request.json.get("user_id")
+    generationService.link(user_id, ws)
     while True:
         data = await ws.recv()
         data = js.loads(data)
         print("Received:", data)
-        await generationService.generate(data, client_id)
+        await generationService.generate(data, user_id)
 
 
 @app.route('/styles')
@@ -69,7 +69,7 @@ async def update_setting(request):
 
 @app.route('/get_setting/<username>')
 async def get_setting(request, username):
-    return await otherService.get_setting(username)
+    return otherService.get_setting(username)
 
 
 # =============================================

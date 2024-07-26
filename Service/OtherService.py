@@ -11,10 +11,10 @@ class OtherService:
         self.settingMapper = SettingMapper.SettingMapper()
 
     def update_setting(self, setting: Setting):
-        self.settingMapper.update_setting(setting)
+        return self.settingMapper.update_setting(setting)
 
     def add_setting(self, setting: Setting):
-        self.settingMapper.add_setting(setting)
+        return self.settingMapper.add_setting(setting)
 
     def get_setting(self, username):
-        self.settingMapper.get_setting(username)
+        return self.settingMapper.get_setting(username)
